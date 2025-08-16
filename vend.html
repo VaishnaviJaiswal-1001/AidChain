@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AidChain - Transparent Donation Tracking</title>
+    <link rel="stylesheet" href="vend.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>🔗 AidChain</h1>
+                <span class="tagline">Transparent Donations</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+                <button class="nav-btn" data-view="donate">Donate</button>
+                <button class="nav-btn" data-view="ledger">Public Ledger</button>
+                <button class="nav-btn recipient-only" data-view="recipient">Recipient Portal</button>
+            </div>
+            <div class="nav-right">
+                <div class="welcome-message" id="welcomeMessage" style="display: none;">
+                    <span class="welcome-text">Welcome, <span id="userName">User</span></span>
+                    <span class="user-role" id="userRole">Donor</span>
+                </div>
+                <div class="wallet-info" id="walletInfo">
+                    <div class="wallet-balance">
+                        <span class="balance-label">Wallet Balance</span>
+                        <span class="balance-amount" id="walletBalance">$5,000</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn" onclick="logout()" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Login View -->
+        <section id="login" class="view active">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="login-logo">🔗</div>
+                        <h2>Welcome to AidChain</h2>
+                        <p>Transparent donation tracking powered by blockchain technology</p>
+                    </div>
+                    
+                    <div class="role-selection">
+                        <h3>Select Your Role</h3>
+                        <div class="role-options">
+                            <div class="role-option" data-role="donor">
+                                <div class="role-icon">👤</div>
+                                <h4>Donor</h4>
+                                <p>Make donations and track their impact</p>
+                            </div>
+                            <div class="role-option" data-role="admin">
+                                <div class="role-icon">⚙️</div>
+                                <h4>Organization Admin</h4>
+                                <p>Manage recipient portal and post updates</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form class="login-form" id="loginForm" style="display: none;">
+                        <div class="selected-role" id="selectedRoleDisplay"></div>
+                        
+                        <div class="form-group">
+                            <label for="loginName">Full Name</label>
+                            <input type="text" id="loginName" required placeholder="Enter your full name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" required placeholder="Enter your email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required placeholder="Enter your password">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="backToRoleSelection()">Back</button>
+                            <button type="submit" class="btn-primary">Sign In</button>
+                        </div>
+                        
+                        <div class="login-footer">
+                            <p>Demo credentials:</p>
+                            <small>Donor: donor@demo.com / password123</small><br>
+                            <small>Admin: admin@demo.com / password123</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard View -->
+        <section id="dashboard" class="view">
+            <div class="container">
+                <div class="page-header">
+                    <h2 id="dashboardTitle">Your Donation Dashboard</h2>
+                    <p id="dashboardSubtitle">Track your contributions and see their real-world impact</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <h3 id="totalDonated">$0</h3>
+                            <p>Total Donated</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-content">
+                            <h3 id="organizationsSupported">0</h3>
+                            <p>Organizations Supported</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3 id="peopleHelped">0</h3>
+                            <p>People Helped</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="impactScore">0%</h3>
+                            <p>Impact Score</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-content">
+                    <div class="donation-history">
+                        <h3>Your Donation History</h3>
+                        <div class="history-list" id="donationHistory">
+                            <div class="empty-state">
+                                <p>No donations yet. Make your first donation to start tracking impact!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="impact-tracker">
+                        <h3>Impact Tracking</h3>
+                        <div class="impact-list" id="impactUpdates">
+                            <div class="empty-state">
+                                <p>Impact updates will appear here once you make donations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donate View -->
+        <section id="donate" class="view">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Make a Donation</h2>
+                    <p>Support verified organizations with transparent fund tracking</p>
+                </div>
+
+                <div class="donate-content">
+                    <div class="organizations-grid">
+                        <div class="org-card" data-org="clean-water">
+                            <div class="org-image">🌊</div>
+                            <div class="org-info">
+                                <h3>Clean Water Initiative</h3>
+                                <p>Providing clean drinking water to rural communities</p>
+                                <div class="org-stats">
+                                    <span>Impact: 10,000+ people served</span>
+                                    <span>Transparency: 98%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="org-card" data-org="education">
+                            <div class="org-image">📚</div>
+                            <div class="org-info">
+                                <h3>Education for All</h3>
+                                <p>Building schools and providing educational resources</p>
+                                <div class="org-stats">
+                                    <span>Impact: 5,000+ students</span>
+                                    <span>Transparency: 95%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="org-card" data-org="healthcare">
+                            <div class="org-image">🏥</div>
+                            <div class="org-info">
+                                <h3>Healthcare Access</h3>
+                                <p>Mobile clinics and medical supplies for underserved areas</p>
+                                <div class="org-stats">
+                                    <span>Impact: 15,000+ patients</span>
+                                    <span>Transparency: 97%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="donation-form" id="donationForm" style="display: none;">
+                        <h3>Complete Your Donation</h3>
+                        <div class="form-group">
+                            <label>Selected Organization</label>
+                            <div class="selected-org" id="selectedOrg"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="donationAmount">Donation Amount ($)</label>
+                            <input type="number" id="donationAmount" min="1" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="donorName">Your Name</label>
+                            <input type="text" id="donorName" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="donationMessage">Message (Optional)</label>
+                            <textarea id="donationMessage" placeholder="Leave a message for the organization"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn-secondary" onclick="cancelDonation()">Cancel</button>
+                            <button class="btn-primary" onclick="processDonation()">Process Donation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Public Ledger View -->
+        <section id="ledger" class="view">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Public Transparency Ledger</h2>
+                    <p>View all transactions and fund movements in real-time</p>
+                </div>
+
+                <div class="ledger-filters">
+                    <div class="filter-group">
+                        <select id="orgFilter">
+                            <option value="">All Organizations</option>
+                            <option value="clean-water">Clean Water Initiative</option>
+                            <option value="education">Education for All</option>
+                            <option value="healthcare">Healthcare Access</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="typeFilter">
+                            <option value="">All Transactions</option>
+                            <option value="donation">Donations</option>
+                            <option value="disbursement">Disbursements</option>
+                            <option value="impact">Impact Updates</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="ledger-content">
+                    <div class="transaction-list" id="transactionList">
+                        <div class="empty-state">
+                            <p>No transactions yet. The ledger will update as donations are made.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recipient Portal View -->
+        <section id="recipient" class="view">
+            <div class="container">
+                <div class="page-header">
+                    <h2>Recipient Portal</h2>
+                    <p>Update donors on how their contributions are being used</p>
+                </div>
+
+                <div class="recipient-content">
+                    <div class="org-selector">
+                        <label for="recipientOrg">Select Organization</label>
+                        <select id="recipientOrg">
+                            <option value="">Choose organization...</option>
+                            <option value="clean-water">Clean Water Initiative</option>
+                            <option value="education">Education for All</option>
+                            <option value="healthcare">Healthcare Access</option>
+                        </select>
+                    </div>
+
+                    <div class="update-form" id="updateForm" style="display: none;">
+                        <h3>Post Impact Update</h3>
+                        <div class="form-group">
+                            <label for="updateTitle">Update Title</label>
+                            <input type="text" id="updateTitle" placeholder="e.g., Water Well Completed in Village A">
+                        </div>
+                        <div class="form-group">
+                            <label for="updateDescription">Description</label>
+                            <textarea id="updateDescription" placeholder="Describe the impact and how funds were used"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fundsUsed">Funds Used ($)</label>
+                            <input type="number" id="fundsUsed" min="0" placeholder="Amount spent on this initiative">
+                        </div>
+                        <div class="form-group">
+                            <label for="peopleImpacted">People Impacted</label>
+                            <input type="number" id="peopleImpacted" min="0" placeholder="Number of people helped">
+                        </div>
+                        <button class="btn-primary" onclick="submitUpdate()">Submit Update</button>
+                    </div>
+
+                    <div class="recent-updates">
+                        <h3>Recent Updates</h3>
+                        <div class="updates-list" id="recentUpdates">
+                            <div class="empty-state">
+                                <p>No updates posted yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Transaction Modal -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Processing Donation</h3>
+            </div>
+            <div class="modal-body">
+                <div class="transaction-progress">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <span>Creating Smart Contract</span>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <span>Processing Payment</span>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <span>Recording on Blockchain</span>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <span>Notifying Recipient</span>
+                    </div>
+                </div>
+                <div class="transaction-details" id="transactionDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="vend.js"></script>
+</body>
+</html>
